@@ -1,5 +1,6 @@
 { lib
 , fetchPypi
+, fetchgit
 , fetchpatch
 , python
 , buildPythonPackage
@@ -20,22 +21,22 @@ let
   cfg = writeTextFile {
     name = "site.cfg";
     text = (lib.generators.toINI {} {
-      ${blas.implementation} = {
-        include_dirs = "${lib.getDev blas}/include:${lib.getDev lapack}/include";
-        library_dirs = "${blas}/lib:${lapack}/lib";
-        runtime_library_dirs = "${blas}/lib:${lapack}/lib";
-        libraries = "lapack,lapacke,blas,cblas";
-      };
-      lapack = {
-        include_dirs = "${lib.getDev lapack}/include";
-        library_dirs = "${lapack}/lib";
-        runtime_library_dirs = "${lapack}/lib";
-      };
-      blas = {
-        include_dirs = "${lib.getDev blas}/include";
-        library_dirs = "${blas}/lib";
-        runtime_library_dirs = "${blas}/lib";
-      };
+      #${blas.implementation} = {
+      #  include_dirs = "${lib.getDev blas}/include:${lib.getDev lapack}/include";
+      #  library_dirs = "${blas}/lib:${lapack}/lib";
+      #  runtime_library_dirs = "${blas}/lib:${lapack}/lib";
+      #  libraries = "lapack,lapacke,blas,cblas";
+      #};
+      #lapack = {
+      #  include_dirs = "${lib.getDev lapack}/include";
+      #  library_dirs = "${lapack}/lib";
+      #  runtime_library_dirs = "${lapack}/lib";
+      #};
+      #blas = {
+      #  include_dirs = "${lib.getDev blas}/include";
+      #  library_dirs = "${blas}/lib";
+      #  runtime_library_dirs = "${blas}/lib";
+      #};
     });
   };
 in buildPythonPackage rec {
@@ -44,11 +45,12 @@ in buildPythonPackage rec {
   format = "setuptools";
   disabled = pythonOlder "3.7";
 
-  src = fetchPypi {
-    inherit pname version;
-    extension = "tar.gz";
-    hash = "sha256-Ub9JwM0dUr4KJAqmbzRYr8S5XYmT0tBPDZH6YMEK9s0=";
-  };
+  src = fetchgit {
+    url = "https://github.com/ceonlabs/numpy";
+    deepClone = true;
+    rev = "dea4a68945bd810b6e1f7a5576f7c99e07226808";
+    sha256 = "sha256-UtVWCSmeiRGKIJd0UFi1MzXnXWeKWww2L4fpTrfQO+c=";
+    };
 
   patches = lib.optionals python.hasDistutilsCxxPatch [
     # We patch cpython/distutils to fix https://bugs.python.org/issue1222585
@@ -57,9 +59,9 @@ in buildPythonPackage rec {
     ./numpy-distutils-C++.patch
   ];
 
-  nativeBuildInputs = [ gfortran cython ];
-  buildInputs = [ blas lapack ];
-
+  nativeBuildInputs = [ cython ];
+  #buildInputs = [ blas lapack ];
+  buildInputs = [];
   # we default openblas to build with 64 threads
   # if a machine has more than 64 threads, it will segfault
   # see https://github.com/xianyi/OpenBLAS/issues/2993

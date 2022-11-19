@@ -1233,11 +1233,37 @@ mapAliases ({
   python2nix = throw "python2nix has been removed as it is outdated. Use e.g. nixpkgs-pytools instead"; # Added 2021-03-08
   pythonFull = python2Full; # Added 2022-01-11
   pythonPackages = python.pkgs; # Added 2022-01-11
-  pythonPortable = pkgsCross.cosmo.pkgsStatic.python3.withPackages (p: with p; [
-    numpy
-    cython
-    tqdm
+  pythonPortable = python3.withPackages (p: with p; [
+    mynumpy
   ]);
+  pdp = python3.withPackages(p: with p; [
+  ]);
+  # Pass blis, mlk, amd-*, openblas or blas-reference/lapack-reference
+  # This is hard to compile statically, so it is disabled in numpy but
+  # left here for when blis can be plugged in.
+  mynumpy = (python3Packages.numpy.override {
+     # lapack=mylapack; blas=myblas;
+    }).overrideDerivation
+    (old: rec {
+      #nativeBuildInputs = [ pkgs.cython ];  # removes gfortran
+      buildInputs = []; # removes blas and lapac
+      #preBuild = ''
+      #   touch site.cfg
+      #'';
+      preConfigure = ''
+        sed -i 's/-faltivec//' numpy/distutils/system_info.py
+        # avoid problems with CPU extensions
+        sed -i 's/self.disable_optimization = False/self.disable_optimization = True/' numpy/distutils/command/build.py
+    
+        export NPY_NUM_BUILD_JOBS=$NIX_BUILD_CORES
+        export OMP_NUM_THREADS=$((NIX_BUILD_CORES > 64 ? 64 : NIX_BUILD_CORES))
+        export BLAS=None
+        export LAPACK=None
+        export ATLAS=None
+      '';
+ 
+
+    });
   ### Q ###
 
   QmidiNet = throw "'QmidiNet' has been renamed to/replaced by 'qmidinet'"; # Converted to throw 2022-02-22
