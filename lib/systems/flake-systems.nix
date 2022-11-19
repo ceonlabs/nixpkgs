@@ -25,5 +25,6 @@
   "powerpc64le-linux"
   "riscv64-linux"
 
+  "cosmo"
   # "x86_64-freebsd" is excluded because it is mostly broken
 ]
