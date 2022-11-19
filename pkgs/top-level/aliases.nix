@@ -1233,7 +1233,7 @@ mapAliases ({
   python2nix = throw "python2nix has been removed as it is outdated. Use e.g. nixpkgs-pytools instead"; # Added 2021-03-08
   pythonFull = python2Full; # Added 2022-01-11
   pythonPackages = python.pkgs; # Added 2022-01-11
-  pythonPortable = pkgsCross.cosmo.pkgsStatic.python311.withPackages (p: with p; [
+  pythonPortable = pkgsCross.cosmo.pkgsStatic.python3.withPackages (p: with p; [
     numpy
     cython
     tqdm
