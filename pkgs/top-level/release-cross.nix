@@ -174,6 +174,9 @@ in
   m68k = mapTestOnCross lib.systems.examples.m68k linuxCommon;
   s390x = mapTestOnCross lib.systems.examples.s390x linuxCommon;
 
+  /* (Cross-compiled) Linux on x68 */
+  cosmo = mapTestOnCross lib.systems.examples.cosmo linuxCommon;
+  
   /* (Cross-compiled) Linux on x86 */
   x86_64-musl = mapTestOnCross lib.systems.examples.musl64 linuxCommon;
   x86_64-gnu = mapTestOnCross lib.systems.examples.gnu64 linuxCommon;
