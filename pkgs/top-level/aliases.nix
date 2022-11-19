@@ -1233,7 +1233,11 @@ mapAliases ({
   python2nix = throw "python2nix has been removed as it is outdated. Use e.g. nixpkgs-pytools instead"; # Added 2021-03-08
   pythonFull = python2Full; # Added 2022-01-11
   pythonPackages = python.pkgs; # Added 2022-01-11
-
+  pythonPortable = pkgsCross.cosmo.pkgsStatic.python311.withPackages (p: with p; [
+    numpy
+    cython
+    tqdm
+  ]);
   ### Q ###
 
   QmidiNet = throw "'QmidiNet' has been renamed to/replaced by 'qmidinet'"; # Converted to throw 2022-02-22
