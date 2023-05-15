@@ -5,7 +5,6 @@
 , SDL2
 , cmake
 , espeak
-, ffmpeg
 , file
 , freetype
 , glib
@@ -14,11 +13,6 @@
 , jbig2dec
 , leptonica
 , libGL
-, libX11
-, libXau
-, libXcomposite
-, libXdmcp
-, libXfixes
 , libdrm
 , libffi
 , libusb1
@@ -39,17 +33,12 @@
 , sqlite
 , tesseract
 , valgrind
-, wayland
-, wayland-protocols
-, xcbutil
-, xcbutilwm
-, xz
 , buildManPages ? true, ruby
 , useBuiltinLua ? true
-, useStaticFreetype ? false
-, useStaticLibuvc ? false
+, useStaticFreetype ? true
+, useStaticLibuvc ? true
 , useStaticOpenAL ? true
-, useStaticSqlite ? false
+, useStaticSqlite ? true
 }:
 
 let
@@ -78,7 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     SDL2
     espeak
-    ffmpeg
     file
     freetype
     glib
@@ -87,19 +75,14 @@ stdenv.mkDerivation (finalAttrs: {
     jbig2dec
     leptonica
     libGL
-    libX11
-    libXau
-    libXcomposite
-    libXdmcp
-    libXfixes
     libdrm
     libffi
     libusb1
     libuvc
     libvlc
     libvncserver
-    libxcb
-    libxkbcommon
+    #libxcb
+    #libxkbcommon
     lua5_1
     luajit
     mesa
@@ -110,11 +93,6 @@ stdenv.mkDerivation (finalAttrs: {
     sqlite
     tesseract
     valgrind
-    wayland
-    wayland-protocols
-    xcbutil
-    xcbutilwm
-    xz
   ];
 
   patches = [

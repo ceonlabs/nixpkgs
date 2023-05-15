@@ -48,9 +48,7 @@
 , libv4l
 , libva
 , libvdpau
-, libvorbis
 , libxml2
-, live555
 , lua5
 , mpeg2dec
 , ncurses
@@ -66,12 +64,12 @@
 , unzip
 , xorg
 , zlib
-, chromecastSupport ? true, libmicrodns, protobuf
+, chromecastSupport ? false, libmicrodns, protobuf
 , jackSupport ? false
-, onlyLibVLC ? false
+, onlyLibVLC ? true
 , skins2Support ? !onlyLibVLC, freetype
-, waylandSupport ? true, wayland, wayland-protocols
-, withQt5 ? true, qtbase, qtsvg, qtwayland, qtx11extras, wrapQtAppsHook, wrapGAppsHook
+, waylandSupport ? false, wayland, wayland-protocols
+, withQt5 ? false, qtbase, qtsvg, qtwayland, qtx11extras, wrapQtAppsHook, wrapGAppsHook
 }:
 
 # chromecastSupport requires TCP port 8010 to be open for it to work.
@@ -138,7 +136,6 @@ stdenv.mkDerivation rec {
     libv4l
     libva
     libvdpau
-    libvorbis
     libxml2
     lua5
     mpeg2dec
@@ -158,7 +155,6 @@ stdenv.mkDerivation rec {
     libXvMC
     xcbutilkeysyms
   ])
-  ++ optional (!stdenv.hostPlatform.isAarch && !onlyLibVLC) live555
   ++ optional jackSupport libjack2
   ++ optionals chromecastSupport [ libmicrodns protobuf ]
   ++ optionals skins2Support (with xorg; [
@@ -184,19 +180,12 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  LIVE555_PREFIX = if stdenv.hostPlatform.isAarch then null else live555;
 
   # vlc depends on a c11-gcc wrapper script which we don't have so we need to
   # set the path to the compiler
   BUILDCC = "${stdenv.cc}/bin/gcc";
 
   patches = [
-    # patch to build with recent live555
-    # upstream issue: https://code.videolan.org/videolan/vlc/-/issues/25473
-    (fetchpatch {
-      url = "https://code.videolan.org/videolan/vlc/uploads/eb1c313d2d499b8a777314f789794f9d/0001-Add-lssl-and-lcrypto-to-liblive555_plugin_la_LIBADD.patch";
-      sha256 = "0kyi8q2zn2ww148ngbia9c7qjgdrijf4jlvxyxgrj29cb5iy1kda";
-    })
     # patch to build with recent libplacebo
     # https://code.videolan.org/videolan/vlc/-/merge_requests/3027
     (fetchpatch {

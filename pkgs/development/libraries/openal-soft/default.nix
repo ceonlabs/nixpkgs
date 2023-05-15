@@ -1,9 +1,4 @@
-{ lib, stdenv, fetchFromGitHub, cmake, pkg-config, removeReferencesTo
-, alsaSupport ? !stdenv.isDarwin, alsa-lib
-, dbusSupport ? !stdenv.isDarwin, dbus
-, pipewireSupport ? !stdenv.isDarwin, pipewire
-, pulseSupport ? !stdenv.isDarwin, libpulseaudio
-, CoreServices, AudioUnit, AudioToolbox
+{ lib, stdenv, fetchFromGitHub, cmake, pkg-config
 }:
 
 stdenv.mkDerivation rec {
@@ -29,13 +24,9 @@ stdenv.mkDerivation rec {
 
   strictDeps = true;
 
-  nativeBuildInputs = [ cmake pkg-config removeReferencesTo ];
+  nativeBuildInputs = [ cmake pkg-config ];
 
-  buildInputs = lib.optional alsaSupport alsa-lib
-    ++ lib.optional dbusSupport dbus
-    ++ lib.optional pipewireSupport pipewire
-    ++ lib.optional pulseSupport libpulseaudio
-    ++ lib.optionals stdenv.isDarwin [ CoreServices AudioUnit AudioToolbox ];
+  buildInputs = [];
 
   cmakeFlags = [
     # Automatically links dependencies without having to rely on dlopen, thus
@@ -46,9 +37,6 @@ stdenv.mkDerivation rec {
     "-DOSS_INCLUDE_DIR=${stdenv.cc.libc}/include"
   ];
 
-  postInstall = lib.optional pipewireSupport ''
-    remove-references-to -t ${pipewire.dev} $(readlink -f $out/lib/*.so)
-  '';
 
   meta = with lib; {
     description = "OpenAL alternative";
