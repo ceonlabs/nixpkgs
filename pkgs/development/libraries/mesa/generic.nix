@@ -66,6 +66,7 @@ let
     #./disk_cache-include-dri-driver-path-in-cache-key.patch
   ];
 
+  # IMPORTANT FOR ARCAN
   postPatch = ''
     patchShebangs .
 
@@ -92,13 +93,13 @@ let
     "-Dxlib-lease=disabled"
     "-Dglx=disabled"
     "-Dgallium-va=disabled"
-      "-Dgallium-vdpau=disabled"
-      "-Dgallium-xa=disabled"
-      # does not make any sense
-      "-Dandroid-libbacktrace=disabled"
-      # do not want to add the dependencies
-      "-Dlibunwind=disabled"
-      "-Dlmsensors=disabled"
+    "-Dgallium-vdpau=disabled"
+    "-Dgallium-xa=disabled"
+    # does not make any sense
+    "-Dandroid-libbacktrace=disabled"
+    # do not want to add the dependencies
+    "-Dlibunwind=disabled"
+    "-Dlmsensors=disabled"
     # Don't build in debug mode
     # https://gitlab.freedesktop.org/mesa/mesa/blob/master/docs/meson.html#L327
     "-Db_ndebug=true"
@@ -111,18 +112,19 @@ let
     "-Dvulkan-drivers=${lib.concatStringsSep "," vulkanDrivers}"
 
     "-Ddri-drivers-path=${placeholder "drivers"}/lib/dri"
-    "-Dvdpau-libs-path=${placeholder "drivers"}/lib/vdpau"
-    "-Domx-libs-path=${placeholder "drivers"}/lib/bellagio"
-    "-Dva-libs-path=${placeholder "drivers"}/lib/dri"
-    "-Dd3d-drivers-path=${placeholder "drivers"}/lib/d3d"
+    #"-Dvdpau-libs-path=${placeholder "drivers"}/lib/vdpau"
+    #"-Domx-libs-path=${placeholder "drivers"}/lib/bellagio"
+    #"-Dva-libs-path=${placeholder "drivers"}/lib/dri"
+    #"-Dd3d-drivers-path=${placeholder "drivers"}/lib/d3d"
 
-    "-Dgallium-nine=${lib.boolToString enableGalliumNine}" # Direct3D in Wine
-    "-Dosmesa=${lib.boolToString enableOSMesa}" # used by wine
+    #"-Dgallium-nine=${lib.boolToString enableGalliumNine}" # Direct3D in Wine
+    #"-Dosmesa=${lib.boolToString enableOSMesa}" # used by wine
     "-Dmicrosoft-clc=disabled" # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
     "-Dintel-clc=disabled"
 
     # To enable non-mesa gbm backends to be found (e.g. Nvidia)
-    "-Dgbm-backends-path=${libglvnd.driverLink}/lib/gbm:${placeholder "out"}/lib/gbm"
+    #"-Dgbm-backends-path=${libglvnd.driverLink}/lib/gbm:${placeholder "out"}/lib/gbm"
+    # IMPORTANT FOR ARCAN
     "-Dglvnd=true"
   ];
 
