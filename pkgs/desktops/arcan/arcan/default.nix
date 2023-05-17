@@ -12,7 +12,7 @@
 , harfbuzz
 , jbig2dec
 , leptonica
-, libGL
+, libglvnd
 , libdrm
 , libffi
 , libusb1
@@ -33,6 +33,9 @@
 , sqlite
 , tesseract
 , valgrind
+, wayland
+, wayland-protocols
+, xorg
 , buildManPages ? true, ruby
 , useBuiltinLua ? true
 , useStaticFreetype ? true
@@ -67,9 +70,11 @@ stdenv.mkDerivation (finalAttrs: {
   buildInputs = [
     freetype
     mesa
-    libGL
+    libglvnd
     openal
     sqlite
+    libxcb
+    xorg.libX11
   ];
 
   patches = [
@@ -139,11 +144,13 @@ stdenv.mkDerivation (finalAttrs: {
     (cmakeFeatureFlag "FT_REQUIRE_HARFBUZZ" false)
     (cmakeFeatureFlag "FT_REQUIRE_PNG" false)
     (cmakeFeatureFlag "FT_REQUIRE_ZLIB" false)
-    (cmakeFeatureFlag "HYBRID_SDL" false)
+    (cmakeFeatureFlag "HYBRID_SDL" true)
+    (cmakeFeatureFlag "HYBRID_HEADLESS" true)
     (cmakeFeatureFlag "DISABLE_FSRV_GAME" true)
     (cmakeFeatureFlag "DISABLE_FSRV_NET" true)
     (cmakeFeatureFlag "DISABLE_FSRV_REMOTING" true)
     (cmakeFeatureFlag "DISABLE_FSRV_AVFEED" true)
+    (cmakeFeatureFlag "DISABLE_WAYLAND" false)
     (cmakeFeatureFlag "BUILTIN_LUA" useBuiltinLua)
     (cmakeFeatureFlag "DISABLE_JIT" useBuiltinLua)
     (cmakeFeatureFlag "STATIC_FREETYPE" useStaticFreetype)

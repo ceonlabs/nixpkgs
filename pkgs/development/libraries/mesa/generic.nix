@@ -9,17 +9,19 @@
 , libglvnd
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
-, eglPlatforms ? [ ]
+, eglPlatforms ? [ "x11" "wayland" ]
+, wayland, wayland-protocols
 , vulkanLayers ? [ ]
 , withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light && !valgrind-light.meta.broken, valgrind-light
-, enableGalliumNine ? false # stdenv.isLinux
-, enableOSMesa ? false #stdenv.isLinux
-, enableOpenCL ? false #stdenv.isLinux && stdenv.isx86_64
+, enableGalliumNine ? false
+, enableOSMesa ? false
+, enableOpenCL ? false
 , enablePatentEncumberedCodecs ? false
 , jdupes
 , zstd
 , udev
 , zlib
+, libxcb
 }:
 
 /** Packaging design:
@@ -116,6 +118,11 @@ let
     zstd
     expat
     udev
+    wayland
+    wayland-protocols
+    libxcb
+    xorg.libX11
+    xorg.libxshmfence
     ]
     ++ lib.optional withValgrind valgrind-light;
   
@@ -127,6 +134,9 @@ let
     intltool bison flex
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes
+    libxcb    
+    wayland
+    wayland-protocols
   ];
 
   propagatedBuildInputs = [ ] ++ lib.optional withLibdrm libdrm;
