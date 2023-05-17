@@ -105,14 +105,8 @@ let
   '';
 
   outputs = [ "out" "dev" "drivers" ]
-    ++ lib.optional enableOSMesa "osmesa"
-    ++ lib.optional stdenv.isLinux "driversdev"
-    ++ lib.optional enableOpenCL "opencl"
-    # the Dozen drivers depend on libspirv2dxil, but link it statically, and
-    # libspirv2dxil itself is pretty chonky, so relocate it to its own output
-    # in case anything wants to use it at some point
-    ++ lib.optional haveDozen "spirv2dxil";
-
+    ++ lib.optional stdenv.isLinux "driversdev";
+  
   # FIXME: this fixes rusticl/iris segfaulting on startup, _somehow_.
   # Needs more investigating.
   separateDebugInfo = true;
@@ -177,7 +171,7 @@ let
 
   buildInputs = with xorg; [
     expat llvmPackages.libllvm libglvnd xorgproto
-    libX11 libXext libxcb libXt libXfixes libxshmfence libXrandr
+    #libX11 libXext libxcb libXt libXfixes libxshmfence libXrandr
     libffi libvdpau libelf libXvMC
     libpthreadstubs openssl /*or another sha1 provider*/
     zstd
