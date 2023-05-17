@@ -5,7 +5,7 @@
 , fetchFromGitLab
 , intltool, bison, flex, file, python3Packages
 , expat, libdrm, xorg
-, llvmPackages_15, libffi, libomxil-bellagio, libva-minimal
+, llvmPackages_15
 , libelf
 , libglvnd
 , vulkan-loader, glslang
@@ -130,10 +130,10 @@ let
     expat
     llvmPackages_15.libllvm
     libglvnd
-    libffi libelf
+    libelf
     xorg.libpthreadstubs /*or another sha1 provider*/
-    zstd libomxil-bellagio
-     libva-minimal udev 
+    zstd
+    udev 
     ]
     ++ lib.optional withValgrind valgrind-light;
   
