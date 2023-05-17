@@ -125,24 +125,13 @@ let
 
     # To enable non-mesa gbm backends to be found (e.g. Nvidia)
     "-Dgbm-backends-path=${libglvnd.driverLink}/lib/gbm:${placeholder "out"}/lib/gbm"
-  ] ++ lib.optionals stdenv.isLinux [
     "-Dglvnd=true"
+  ];
 
-    # Enable RT for Intel hardware
-  ] ++ lib.optionals enableOpenCL [
-    # Clover, old OpenCL frontend
-    "-Dgallium-opencl=icd"
-    "-Dopencl-spirv=true"
-
-  ] ++ lib.optional enablePatentEncumberedCodecs
-    "-Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec"
-  ++ lib.optional (vulkanLayers != []) "-D vulkan-layers=${builtins.concatStringsSep "," vulkanLayers}";
-
-  buildInputs = with xorg; [
-    expat llvmPackages.libllvm libglvnd xorgproto
-    #libX11 libXext libxcb libXt libXfixes libxshmfence libXrandr
-    libffi libvdpau libelf libXvMC
-    libpthreadstubs /*or another sha1 provider*/
+  buildInputs = [
+    expat llvmPackages.libllvm libglvnd
+    libffi libvdpau libelf
+    xorg.libpthreadstubs /*or another sha1 provider*/
     zstd]
     ++ lib.optionals stdenv.isLinux [ libomxil-bellagio libva-minimal udev ]
     ++ lib.optional withValgrind valgrind-light;
@@ -156,8 +145,8 @@ let
     jdupes glslang
   ];
 
-  propagatedBuildInputs = with xorg; [
-    libXdamage libXxf86vm
+  propagatedBuildInputs = [
+   # libXdamage libXxf86vm
   ] ++ lib.optional withLibdrm libdrm
     ++ lib.optionals stdenv.isDarwin [ OpenGL Xplugin ];
 
