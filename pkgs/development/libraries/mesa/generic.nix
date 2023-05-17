@@ -70,13 +70,8 @@ let
       "get_option('datadir')" "'${placeholder "out"}/share'"
   '';
 
-  outputs = [ "out" "dev" "drivers" ]
-    ++ lib.optional stdenv.isLinux "driversdev";
+  outputs = [ "out" "dev" "drivers" "driversdev"];
   
-  #preConfigure = ''
-  #  PATH=${llvmPackages_15.libllvm.dev}/bin:$PATH
-  #'';
-
   # TODO: Figure out how to enable opencl without having a runtime dependency on clang
   mesonFlags = [
     "--sysconfdir=/etc"
@@ -95,7 +90,6 @@ let
     # https://gitlab.freedesktop.org/mesa/mesa/blob/master/docs/meson.html#L327
     "-Db_ndebug=true"
 
-    #"-Ddisk-cache-key=${placeholder "drivers"}"
     "-Ddri-search-path=${libglvnd.driverLink}/lib/dri"
 
     "-Dplatforms=${lib.concatStringsSep "," eglPlatforms}"
@@ -103,18 +97,8 @@ let
     "-Dvulkan-drivers=${lib.concatStringsSep "," vulkanDrivers}"
 
     "-Ddri-drivers-path=${placeholder "drivers"}/lib/dri"
-    #"-Dvdpau-libs-path=${placeholder "drivers"}/lib/vdpau"
-    #"-Domx-libs-path=${placeholder "drivers"}/lib/bellagio"
-    #"-Dva-libs-path=${placeholder "drivers"}/lib/dri"
-    #"-Dd3d-drivers-path=${placeholder "drivers"}/lib/d3d"
-
-    #"-Dgallium-nine=${lib.boolToString enableGalliumNine}" # Direct3D in Wine
-    #"-Dosmesa=${lib.boolToString enableOSMesa}" # used by wine
     "-Dmicrosoft-clc=disabled" # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
     "-Dintel-clc=disabled"
-
-    # To enable non-mesa gbm backends to be found (e.g. Nvidia)
-    #"-Dgbm-backends-path=${libglvnd.driverLink}/lib/gbm:${placeholder "out"}/lib/gbm"
     # IMPORTANT FOR ARCAN
     "-Dglvnd=true"
   ];
@@ -129,13 +113,12 @@ let
   nativeBuildInputs = [
     zstd
     udev 
-    #libelf
     expat
     meson pkg-config ninja
-    xorg.libpthreadstubs /*or another sha1 provider*/
+    xorg.libpthreadstubs
     intltool bison flex file
     python3Packages.python python3Packages.mako python3Packages.ply
-    jdupes #glslang
+    jdupes
     llvmPackages_15.libllvm
   ];
 
@@ -145,7 +128,7 @@ let
 
   postInstall = ''
     # Some installs don't have any drivers so this directory is never created.
-    mkdir -p $drivers $osmesa
+    mkdir -p $drivers
   '' + lib.optionalString stdenv.isLinux ''
     mkdir -p $drivers/lib
 
@@ -170,25 +153,6 @@ let
     # drivers are in $drivers)
     for js in $drivers/share/vulkan/icd.d/*.json; do
       substituteInPlace "$js" --replace "$out" "$drivers"
-    done
-  '' + lib.optionalString enableOpenCL ''
-    # Move OpenCL stuff
-    mkdir -p $opencl/lib
-    mv -t "$opencl/lib/"     \
-      $out/lib/gallium-pipe   \
-      $out/lib/lib*OpenCL*
-
-    # We construct our own .icd files that contain absolute paths.
-    mkdir -p $opencl/etc/OpenCL/vendors/
-    echo $opencl/lib/libMesaOpenCL.so > $opencl/etc/OpenCL/vendors/mesa.icd
-  '' + lib.optionalString enableOSMesa ''
-    # move libOSMesa to $osmesa, as it's relatively big
-    mkdir -p $osmesa/lib
-    mv -t $osmesa/lib/ $out/lib/libOSMesa*
-  '' + lib.optionalString (vulkanLayers != []) ''
-    mv -t $drivers/lib $out/lib/libVkLayer*
-    for js in $drivers/share/vulkan/{im,ex}plicit_layer.d/*.json; do
-      substituteInPlace "$js" --replace '"libVkLayer_' '"'"$drivers/lib/libVkLayer_"
     done
   '';
 
