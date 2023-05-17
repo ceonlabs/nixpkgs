@@ -6,9 +6,7 @@
 , intltool, bison, flex, file, python3Packages
 , expat, libdrm, xorg
 , llvmPackages_15
-, libelf
 , libglvnd
-#, vulkan-loader, glslang
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
 , eglPlatforms ? [ ]
@@ -54,15 +52,9 @@ let
   };
   
 
-  # TODO:
-  #  revive ./dricore-gallium.patch when it gets ported (from Ubuntu), as it saved
-  #  ~35 MB in $drivers; watch https://launchpad.net/ubuntu/+source/mesa/+changelog
   patches = [
     # fixes pkgsMusl.mesa build
     ./musl.patch
-
-    #./opencl.patch
-    #./disk_cache-include-dri-driver-path-in-cache-key.patch
   ];
 
   # IMPORTANT FOR ARCAN
@@ -81,9 +73,9 @@ let
   outputs = [ "out" "dev" "drivers" ]
     ++ lib.optional stdenv.isLinux "driversdev";
   
-  preConfigure = ''
-    PATH=${llvmPackages_15.libllvm.dev}/bin:$PATH
-  '';
+  #preConfigure = ''
+  #  PATH=${llvmPackages_15.libllvm.dev}/bin:$PATH
+  #'';
 
   # TODO: Figure out how to enable opencl without having a runtime dependency on clang
   mesonFlags = [
@@ -137,7 +129,7 @@ let
   nativeBuildInputs = [
     zstd
     udev 
-    libelf
+    #libelf
     expat
     meson pkg-config ninja
     xorg.libpthreadstubs /*or another sha1 provider*/
