@@ -22806,7 +22806,6 @@ with pkgs;
   # an OpenGL implementation, we can just use that.
   libGL = if stdenv.hostPlatform.useAndroidPrebuilt then stdenv
           else callPackage ../development/libraries/mesa/stubs.nix {
-            inherit (darwin.apple_sdk.frameworks) OpenGL;
           };
 
   # Default libGLU
@@ -22814,13 +22813,9 @@ with pkgs;
 
   # Keep Mesa 22.3 for now because 23.0 does not build on Darwin.
   # FIXME: remove, also investigate why we even need Mesa on Darwin.
-  mesa_22_3 = darwin.apple_sdk_11_0.callPackage ../development/libraries/mesa/22.3.nix {
-    inherit (darwin.apple_sdk_11_0.frameworks) OpenGL;
-    inherit (darwin.apple_sdk_11_0.libs) Xplugin;
+  mesa_22_3 = callPackage ../development/libraries/mesa/22.3.nix {
   };
-  mesa_23_0 = darwin.apple_sdk_11_0.callPackage ../development/libraries/mesa/23.0.nix {
-    inherit (darwin.apple_sdk_11_0.frameworks) OpenGL;
-    inherit (darwin.apple_sdk_11_0.libs) Xplugin;
+  mesa_23_0 = callPackage ../development/libraries/mesa/23.0.nix {
   };
   mesa = if stdenv.isDarwin then mesa_22_3 else mesa_23_0;
 

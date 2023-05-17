@@ -13,7 +13,6 @@
 , vulkanDrivers ? ["swrast"]
 , eglPlatforms ? [ ]
 , vulkanLayers ? [ ]
-, OpenGL, Xplugin
 , withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light && !valgrind-light.meta.broken, valgrind-light
 , enableGalliumNine ? false # stdenv.isLinux
 , enableOSMesa ? false #stdenv.isLinux
@@ -42,7 +41,6 @@ let
 
   withLibdrm = lib.meta.availableOn stdenv.hostPlatform libdrm;
 
-  llvmPackages = llvmPackages_15;
 
   self = stdenv.mkDerivation {
   pname = "mesa";
@@ -84,7 +82,7 @@ let
     ++ lib.optional stdenv.isLinux "driversdev";
   
   preConfigure = ''
-    PATH=${llvmPackages.libllvm.dev}/bin:$PATH
+    PATH=${llvmPackages_15.libllvm.dev}/bin:$PATH
   '';
 
   # TODO: Figure out how to enable opencl without having a runtime dependency on clang
@@ -129,11 +127,14 @@ let
   ];
 
   buildInputs = [
-    expat llvmPackages.libllvm libglvnd
+    expat
+    llvmPackages_15.libllvm
+    libglvnd
     libffi libvdpau libelf
     xorg.libpthreadstubs /*or another sha1 provider*/
-    zstd]
-    ++ lib.optionals stdenv.isLinux [ libomxil-bellagio libva-minimal udev ]
+    zstd libomxil-bellagio
+     libva-minimal udev 
+    ]
     ++ lib.optional withValgrind valgrind-light;
   
   depsBuildBuild = [ pkg-config ];
@@ -147,8 +148,7 @@ let
 
   propagatedBuildInputs = [
    # libXdamage libXxf86vm
-  ] ++ lib.optional withLibdrm libdrm
-    ++ lib.optionals stdenv.isDarwin [ OpenGL Xplugin ];
+  ] ++ lib.optional withLibdrm libdrm;
 
   doCheck = false;
 
@@ -239,7 +239,7 @@ let
 
   passthru = {
     inherit (libglvnd) driverLink;
-    inherit llvmPackages;
+    inherit llvmPackages_15;
 
     libdrm = if withLibdrm then libdrm else null;
 
@@ -249,7 +249,7 @@ let
         buildCommand = ''
           echo ${self.dev} >>$out
         '';
-        disallowedRequisites = [ llvmPackages.llvm self.drivers ];
+        disallowedRequisites = [ llvmPackages_15.llvm self.drivers ];
       };
     };
   };

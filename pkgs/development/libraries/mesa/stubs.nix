@@ -1,7 +1,6 @@
 { stdenv
 , libglvnd
 , mesa
-, OpenGL
 , testers
 }:
 
@@ -16,7 +15,6 @@ stdenv.mkDerivation (finalAttrs: {
   # the X extensions to OpenGL.
   buildCommand = if stdenv.hostPlatform.isDarwin then ''
     mkdir -p $out/nix-support $dev
-    echo ${OpenGL} >> $out/nix-support/propagated-build-inputs
     ln -s ${mesa.out}/lib $out/lib
 
     mkdir -p $dev/lib/pkgconfig $dev/nix-support
