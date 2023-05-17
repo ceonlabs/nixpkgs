@@ -6,8 +6,8 @@
 , intltool, bison, flex, file, python3Packages
 , expat, libdrm, xorg
 , llvmPackages_15, libffi, libomxil-bellagio, libva-minimal
-, libelf, libvdpau
-, libglvnd, libunwind
+, libelf
+, libglvnd
 , vulkan-loader, glslang
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
@@ -130,7 +130,7 @@ let
     expat
     llvmPackages_15.libllvm
     libglvnd
-    libffi libvdpau libelf
+    libffi libelf
     xorg.libpthreadstubs /*or another sha1 provider*/
     zstd libomxil-bellagio
      libva-minimal udev 
