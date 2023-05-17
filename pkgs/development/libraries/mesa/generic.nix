@@ -3,7 +3,7 @@
 { stdenv, lib, fetchurl, fetchpatch
 , meson, pkg-config, ninja
 , fetchFromGitLab
-, intltool, bison, flex, file, python3Packages
+, intltool, bison, flex, python3Packages
 , expat, libdrm, xorg
 , llvmPackages_15
 , libglvnd
@@ -114,7 +114,7 @@ let
     expat
     meson pkg-config ninja
     xorg.libpthreadstubs
-    intltool bison flex file
+    intltool bison flex
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes
     llvmPackages_15.libllvm
