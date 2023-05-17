@@ -19,7 +19,6 @@
 , enableOSMesa ? false #stdenv.isLinux
 , enableOpenCL ? false #stdenv.isLinux && stdenv.isx86_64
 , enablePatentEncumberedCodecs ? false
-, libclc
 , jdupes
 , zstd
 , udev
@@ -122,6 +121,7 @@ let
     "-Dgallium-nine=${lib.boolToString enableGalliumNine}" # Direct3D in Wine
     "-Dosmesa=${lib.boolToString enableOSMesa}" # used by wine
     "-Dmicrosoft-clc=disabled" # Only relevant on Windows (OpenCL 1.2 API on top of D3D12)
+    "-Dintel-clc=disabled"
 
     # To enable non-mesa gbm backends to be found (e.g. Nvidia)
     "-Dgbm-backends-path=${libglvnd.driverLink}/lib/gbm:${placeholder "out"}/lib/gbm"
@@ -129,7 +129,6 @@ let
     "-Dglvnd=true"
 
     # Enable RT for Intel hardware
-    "-Dintel-clc=enabled"
   ] ++ lib.optionals enableOpenCL [
     # Clover, old OpenCL frontend
     "-Dgallium-opencl=icd"
