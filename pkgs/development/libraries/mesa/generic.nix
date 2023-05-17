@@ -18,7 +18,6 @@
 , enablePatentEncumberedCodecs ? false
 , jdupes
 , zstd
-, udev
 }:
 
 /** Packaging design:
@@ -112,7 +111,6 @@ let
 
   nativeBuildInputs = [
     zstd
-    udev 
     expat
     meson pkg-config ninja
     xorg.libpthreadstubs
