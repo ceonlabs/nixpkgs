@@ -203,21 +203,13 @@ let
   postFixup = lib.optionalString stdenv.isLinux ''
     # set the default search path for DRI drivers; used e.g. by X server
     substituteInPlace "$dev/lib/pkgconfig/dri.pc" --replace "$drivers" "${libglvnd.driverLink}"
-    [ -f "$dev/lib/pkgconfig/d3d.pc" ] && substituteInPlace "$dev/lib/pkgconfig/d3d.pc" --replace "$drivers" "${libglvnd.driverLink}"
 
     # remove pkgconfig files for GL/EGL; they are provided by libGL.
     rm -f $dev/lib/pkgconfig/{gl,egl}.pc
 
     # Move development files for libraries in $drivers to $driversdev
     mkdir -p $driversdev/include
-    mv $dev/include/xa_* $dev/include/d3d* -t $driversdev/include || true
     mkdir -p $driversdev/lib/pkgconfig
-    for pc in lib/pkgconfig/{xatracker,d3d}.pc; do
-      if [ -f "$dev/$pc" ]; then
-        substituteInPlace "$dev/$pc" --replace $out $drivers
-        mv $dev/$pc $driversdev/$pc
-      fi
-    done
 
     # NAR doesn't support hard links, so convert them to symlinks to save space.
     jdupes --hard-links --link-soft --recurse "$drivers"
@@ -230,29 +222,6 @@ let
       fi
     done
   '';
-
-  #env.NIX_CFLAGS_COMPILE = toString (lib.optionals stdenv.isDarwin [ "-fno-common" ] ++ lib.optionals enableOpenCL [
-  #  "-UPIPE_SEARCH_DIR"
-  #  "-DPIPE_SEARCH_DIR=\"${placeholder "opencl"}/lib/gallium-pipe\""
-  #]);
-
-  passthru = {
-    inherit (libglvnd) driverLink;
-    inherit llvmPackages_15;
-
-    libdrm = if withLibdrm then libdrm else null;
-
-    tests = lib.optionalAttrs stdenv.isLinux {
-      devDoesNotDependOnLLVM = stdenv.mkDerivation {
-        name = "mesa-dev-does-not-depend-on-llvm";
-        buildCommand = ''
-          echo ${self.dev} >>$out
-        '';
-        disallowedRequisites = [ llvmPackages_15.llvm self.drivers ];
-      };
-    };
-  };
-
   meta = with lib; {
     description = "An open source 3D graphics library";
     longDescription = ''
