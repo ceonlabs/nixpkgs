@@ -8,7 +8,7 @@
 , llvmPackages_15
 , libelf
 , libglvnd
-, vulkan-loader, glslang
+#, vulkan-loader, glslang
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
 , eglPlatforms ? [ ]
@@ -130,7 +130,6 @@ let
 
   buildInputs = [
     expat
-    llvmPackages_15.libllvm
     libglvnd
     libelf
     xorg.libpthreadstubs /*or another sha1 provider*/
@@ -145,7 +144,8 @@ let
     meson pkg-config ninja
     intltool bison flex file
     python3Packages.python python3Packages.mako python3Packages.ply
-    jdupes glslang
+    jdupes #glslang
+    llvmPackages_15.libllvm
   ];
 
   propagatedBuildInputs = [
