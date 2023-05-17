@@ -18,6 +18,8 @@
 , enablePatentEncumberedCodecs ? false
 , jdupes
 , zstd
+, udev
+, zlib
 }:
 
 /** Packaging design:
@@ -70,7 +72,11 @@ let
   '';
 
   outputs = [ "out" "dev" "drivers" "driversdev"];
-  
+
+  preConfigure = ''
+    PATH=${llvmPackages_15.libllvm.dev}/bin:$PATH
+  '';
+
   # TODO: Figure out how to enable opencl without having a runtime dependency on clang
   mesonFlags = [
     "--sysconfdir=/etc"
@@ -103,21 +109,24 @@ let
   ];
 
   buildInputs = [
+    llvmPackages_15.llvm
+    llvmPackages_15.libllvm
     libglvnd
+    zlib
+    zstd
+    expat
+    udev
     ]
     ++ lib.optional withValgrind valgrind-light;
   
   depsBuildBuild = [ pkg-config ];
 
   nativeBuildInputs = [
-    zstd
-    expat
     meson pkg-config ninja
     xorg.libpthreadstubs
     intltool bison flex
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes
-    llvmPackages_15.libllvm
   ];
 
   propagatedBuildInputs = [ ] ++ lib.optional withLibdrm libdrm;
