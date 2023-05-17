@@ -3,16 +3,16 @@
 { stdenv, lib, fetchurl, fetchpatch
 , meson, pkg-config, ninja
 , fetchFromGitLab
-, intltool, bison, flex, file, python3Packages, wayland-scanner
-, expat, libdrm, xorg, wayland, wayland-protocols, openssl
+, intltool, bison, flex, file, python3Packages
+, expat, libdrm, xorg
 , llvmPackages_15, libffi, libomxil-bellagio, libva-minimal
 , libelf, libvdpau
 , libglvnd, libunwind
 , vulkan-loader, glslang
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
-, eglPlatforms ? [ ] #[ "x11" ] ++ lib.optionals stdenv.isLinux [ "wayland" ]
-, vulkanLayers ? [] #lib.optionals (!stdenv.isDarwin) [ "device-select" "overlay" "intel-nullhw" ] # No Vulkan support on Darwin
+, eglPlatforms ? [ ]
+, vulkanLayers ? [ ]
 , OpenGL, Xplugin
 , withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light && !valgrind-light.meta.broken, valgrind-light
 , enableGalliumNine ? false # stdenv.isLinux
@@ -21,11 +21,7 @@
 , enablePatentEncumberedCodecs ? false
 , libclc
 , jdupes
-, rustc
-, rust-bindgen
-, spirv-llvm-translator
 , zstd
-, directx-headers
 , udev
 }:
 
@@ -48,21 +44,7 @@ let
   withLibdrm = lib.meta.availableOn stdenv.hostPlatform libdrm;
 
   llvmPackages = llvmPackages_15;
-  # Align all the Mesa versions used. Required to prevent explosions when
-  # two different LLVMs are loaded in the same process.
-  # FIXME: these should really go into some sort of versioned LLVM package set
-  rust-bindgen' = rust-bindgen.override {
-    rust-bindgen-unwrapped = rust-bindgen.unwrapped.override {
-      clang = llvmPackages.clang;
-    };
-  };
-  spirv-llvm-translator' = spirv-llvm-translator.override {
-    inherit (llvmPackages) llvm;
-  };
 
-  haveWayland = lib.elem "wayland" eglPlatforms;
-  haveZink = lib.elem "zink" galliumDrivers;
-  haveDozen = (lib.elem "d3d12" galliumDrivers) || (lib.elem "microsoft-experimental" vulkanDrivers);
   self = stdenv.mkDerivation {
   pname = "mesa";
     version = "23.1.0";
@@ -97,20 +79,11 @@ let
       "get_option('datadir')" "'${placeholder "out"}/share'"
     substituteInPlace src/amd/vulkan/meson.build --replace \
       "get_option('datadir')" "'${placeholder "out"}/share'"
-  ''
-  # TODO: can be removed >= 23.0.4 (most likely)
-  # https://gitlab.freedesktop.org/mesa/mesa/-/commit/035aa34ed5eb418339c0e2d2
-  + ''
-    sed '/--size_t-is-usize/d' -i src/gallium/frontends/rusticl/meson.build
   '';
 
   outputs = [ "out" "dev" "drivers" ]
     ++ lib.optional stdenv.isLinux "driversdev";
   
-  # FIXME: this fixes rusticl/iris segfaulting on startup, _somehow_.
-  # Needs more investigating.
-  separateDebugInfo = true;
-
   preConfigure = ''
     PATH=${llvmPackages.libllvm.dev}/bin:$PATH
   '';
@@ -162,9 +135,6 @@ let
     "-Dgallium-opencl=icd"
     "-Dopencl-spirv=true"
 
-    # Rusticl, new OpenCL frontend
-    "-Dgallium-rusticl=true" "-Drust_std=2021"
-    "-Dclang-libdir=${llvmPackages.clang-unwrapped.lib}/lib"
   ] ++ lib.optional enablePatentEncumberedCodecs
     "-Dvideo-codecs=h264dec,h264enc,h265dec,h265enc,vc1dec"
   ++ lib.optional (vulkanLayers != []) "-D vulkan-layers=${builtins.concatStringsSep "," vulkanLayers}";
@@ -173,16 +143,11 @@ let
     expat llvmPackages.libllvm libglvnd xorgproto
     #libX11 libXext libxcb libXt libXfixes libxshmfence libXrandr
     libffi libvdpau libelf libXvMC
-    libpthreadstubs openssl /*or another sha1 provider*/
-    zstd
-  ] ++ lib.optionals haveWayland [ wayland wayland-protocols ]
+    libpthreadstubs /*or another sha1 provider*/
+    zstd]
     ++ lib.optionals stdenv.isLinux [ libomxil-bellagio libva-minimal udev ]
-    ++ lib.optionals stdenv.isDarwin [ libunwind ]
-    ++ lib.optionals enableOpenCL [ libclc llvmPackages.clang llvmPackages.clang-unwrapped rustc rust-bindgen' spirv-llvm-translator' ]
-    ++ lib.optional withValgrind valgrind-light
-    ++ lib.optional haveZink vulkan-loader
-    ++ lib.optional haveDozen directx-headers;
-
+    ++ lib.optional withValgrind valgrind-light;
+  
   depsBuildBuild = [ pkg-config ];
 
   nativeBuildInputs = [
@@ -190,7 +155,7 @@ let
     intltool bison flex file
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes glslang
-  ] ++ lib.optional haveWayland wayland-scanner;
+  ];
 
   propagatedBuildInputs = with xorg; [
     libXdamage libXxf86vm
@@ -237,7 +202,6 @@ let
     # We construct our own .icd files that contain absolute paths.
     mkdir -p $opencl/etc/OpenCL/vendors/
     echo $opencl/lib/libMesaOpenCL.so > $opencl/etc/OpenCL/vendors/mesa.icd
-    echo $opencl/lib/libRusticlOpenCL.so > $opencl/etc/OpenCL/vendors/rusticl.icd
   '' + lib.optionalString enableOSMesa ''
     # move libOSMesa to $osmesa, as it's relatively big
     mkdir -p $osmesa/lib
@@ -247,10 +211,6 @@ let
     for js in $drivers/share/vulkan/{im,ex}plicit_layer.d/*.json; do
       substituteInPlace "$js" --replace '"libVkLayer_' '"'"$drivers/lib/libVkLayer_"
     done
-  '' + lib.optionalString haveDozen ''
-    mkdir -p $spirv2dxil/{bin,lib}
-    mv -t $spirv2dxil/lib $out/lib/libspirv_to_dxil*
-    mv -t $spirv2dxil/bin $out/bin/spirv2dxil
   '';
 
   postFixup = lib.optionalString stdenv.isLinux ''
@@ -282,10 +242,6 @@ let
         patchelf --set-rpath "$(patchelf --print-rpath $lib):$drivers/lib" "$lib"
       fi
     done
-    # add RPATH here so Zink can find libvulkan.so
-    ${lib.optionalString haveZink ''
-      patchelf --add-rpath ${vulkan-loader}/lib $drivers/lib/dri/zink_dri.so
-    ''}
   '';
 
   env.NIX_CFLAGS_COMPILE = toString (lib.optionals stdenv.isDarwin [ "-fno-common" ] ++ lib.optionals enableOpenCL [
