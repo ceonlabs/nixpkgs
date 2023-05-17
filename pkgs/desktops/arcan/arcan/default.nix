@@ -47,13 +47,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "arcan" + lib.optionalString useStaticOpenAL "-static-openal";
-  version = "0.6.2.1";
+  version = "7bf64a1bda2cdf82a2f172035df95235ad187e9d";
 
   src = fetchFromGitHub {
     owner = "letoram";
     repo = "arcan";
     rev = finalAttrs.version;
-    hash = "sha256-7H3fVSsW5VANLqwhykY+Q53fPjz65utaGksh/OpZnJM=";
+    hash = "sha256-DkYzaui6fcVm3YcWyzsxvcRqDx/cFZsWVgZ3rt0fWwE=";
   };
 
   nativeBuildInputs = [
@@ -65,41 +65,19 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   buildInputs = [
-    SDL2
-    espeak
-    file
     freetype
-    glib
-    gumbo
-    harfbuzz
-    jbig2dec
-    leptonica
-    libGL
-    libdrm
-    libffi
-    libusb1
-    libuvc
-    libvlc
-    libvncserver
-    #libxcb
-    #libxkbcommon
-    lua5_1
-    luajit
     mesa
-    mupdf.dev
+    libGL
     openal
-    openjpeg.dev
-    pcre
     sqlite
-    tesseract
-    valgrind
   ];
 
   patches = [
     # Nixpkgs-specific: redirect vendoring
-    ./000-openal.patch
-    ./001-luajit.patch
-    ./002-libuvc.patch
+    #./000-openal.patch
+    #./001-luajit.patch
+    #./002-libuvc.patch
+    ./004-x11.patch
   ];
 
   # Emulate external/git/clone.sh
@@ -151,7 +129,21 @@ stdenv.mkDerivation (finalAttrs: {
     # The upstream project recommends tagging the distribution
     "-DDISTR_TAG=Nixpkgs"
     "-DENGINE_BUILDTAG=${finalAttrs.version}"
-    (cmakeFeatureFlag "HYBRID_SDL" true)
+    (cmakeFeatureFlag "FT_DISABLE_BROTLI" true)
+    (cmakeFeatureFlag "FT_DISABLE_BZIP2" true)
+    (cmakeFeatureFlag "FT_DISABLE_HARFBUZZ" true)
+    (cmakeFeatureFlag "FT_DISABLE_PNG" true)
+    (cmakeFeatureFlag "FT_DISABLE_ZLIB" true)
+    (cmakeFeatureFlag "FT_REQUIRE_BROTLI" false)
+    (cmakeFeatureFlag "FT_REQUIRE_BZIP2" false)
+    (cmakeFeatureFlag "FT_REQUIRE_HARFBUZZ" false)
+    (cmakeFeatureFlag "FT_REQUIRE_PNG" false)
+    (cmakeFeatureFlag "FT_REQUIRE_ZLIB" false)
+    (cmakeFeatureFlag "HYBRID_SDL" false)
+    (cmakeFeatureFlag "DISABLE_FSRV_GAME" true)
+    (cmakeFeatureFlag "DISABLE_FSRV_NET" true)
+    (cmakeFeatureFlag "DISABLE_FSRV_REMOTING" true)
+    (cmakeFeatureFlag "DISABLE_FSRV_AVFEED" true)
     (cmakeFeatureFlag "BUILTIN_LUA" useBuiltinLua)
     (cmakeFeatureFlag "DISABLE_JIT" useBuiltinLua)
     (cmakeFeatureFlag "STATIC_FREETYPE" useStaticFreetype)
