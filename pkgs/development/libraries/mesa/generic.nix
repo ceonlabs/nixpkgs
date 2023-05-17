@@ -129,19 +129,19 @@ let
   ];
 
   buildInputs = [
-    expat
     libglvnd
-    libelf
-    xorg.libpthreadstubs /*or another sha1 provider*/
-    zstd
-    udev 
     ]
     ++ lib.optional withValgrind valgrind-light;
   
   depsBuildBuild = [ pkg-config ];
 
   nativeBuildInputs = [
+    zstd
+    udev 
+    libelf
+    expat
     meson pkg-config ninja
+    xorg.libpthreadstubs /*or another sha1 provider*/
     intltool bison flex file
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes #glslang
