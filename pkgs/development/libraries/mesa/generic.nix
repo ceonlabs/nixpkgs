@@ -41,7 +41,6 @@ let
 
   withLibdrm = lib.meta.availableOn stdenv.hostPlatform libdrm;
 
-
   self = stdenv.mkDerivation {
   pname = "mesa";
     version = "23.1.0";
@@ -148,9 +147,7 @@ let
     llvmPackages_15.libllvm
   ];
 
-  propagatedBuildInputs = [
-   # libXdamage libXxf86vm
-  ] ++ lib.optional withLibdrm libdrm;
+  propagatedBuildInputs = [ ] ++ lib.optional withLibdrm libdrm;
 
   doCheck = false;
 
@@ -234,10 +231,10 @@ let
     done
   '';
 
-  env.NIX_CFLAGS_COMPILE = toString (lib.optionals stdenv.isDarwin [ "-fno-common" ] ++ lib.optionals enableOpenCL [
-    "-UPIPE_SEARCH_DIR"
-    "-DPIPE_SEARCH_DIR=\"${placeholder "opencl"}/lib/gallium-pipe\""
-  ]);
+  #env.NIX_CFLAGS_COMPILE = toString (lib.optionals stdenv.isDarwin [ "-fno-common" ] ++ lib.optionals enableOpenCL [
+  #  "-UPIPE_SEARCH_DIR"
+  #  "-DPIPE_SEARCH_DIR=\"${placeholder "opencl"}/lib/gallium-pipe\""
+  #]);
 
   passthru = {
     inherit (libglvnd) driverLink;
