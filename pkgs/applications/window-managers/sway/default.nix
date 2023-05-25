@@ -6,7 +6,7 @@
 , nixosTests
 # Used by the NixOS module:
 , isNixOS ? false
-, enableXWayland ? true, xorg
+, enableXWayland ? false, xorg
 , systemdSupport ? lib.meta.availableOn stdenv.hostPlatform systemd, systemd
 , dbusSupport ? true
 , dbus
