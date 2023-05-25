@@ -22,16 +22,16 @@
 , openjpeg
 , pcre
 , pkg-config
+, freetype
 , sqlite
-, valgrind
 , wayland
 , wayland-protocols
 , buildManPages ? true, ruby
-, useBuiltinLua ? true
-, useStaticFreetype ? true
-, useStaticLibuvc ? true
-, useStaticOpenAL ? true
-, useStaticSqlite ? true
+, useBuiltinLua ? false
+, useStaticFreetype ? false
+, useStaticLibuvc ? false
+, useStaticOpenAL ? false
+, useStaticSqlite ? false
 , xz
 , xorg
 }:
@@ -71,6 +71,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     #ffmpeg
+    freetype
     xorg.libX11
     file
     libxkbcommon
@@ -90,7 +91,6 @@ stdenv.mkDerivation (finalAttrs: {
     openjpeg.dev
     pcre
     sqlite
-    valgrind
     wayland
     wayland-protocols
     xz
@@ -150,6 +150,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-DBUILD_PRESET=everything"
+    "-DCMAKE_BUILD_TYPE=DebugTrace"
     # The upstream project recommends tagging the distribution
     "-DDISTR_TAG=Nixpkgs"
     "-DVIDEO_PLATFORM=egl-dri"

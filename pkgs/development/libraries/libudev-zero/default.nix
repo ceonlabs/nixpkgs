@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub }:
+{ lib, stdenv, fetchFromGitHub, binutils }:
 
 stdenv.mkDerivation rec {
   pname = "libudev-zero";
@@ -11,6 +11,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-SU1pPmLLeTWZe5ybhmDplFw6O/vpEjFAKgfKDl0RS4U=";
   };
 
+  nativeBuildInputs = [ binutils.bintools ];
   makeFlags = [ "PREFIX=$(out)" ];
 
   # Just let the installPhase build stuff, because there's no
