@@ -22,7 +22,7 @@
 , glslang
 , nixosTests
 
-, enableXWayland ? true
+, enableXWayland ? false
 , xwayland ? null
 }:
 
