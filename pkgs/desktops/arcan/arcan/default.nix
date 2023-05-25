@@ -2,14 +2,10 @@
 , stdenv
 , fetchFromGitHub
 , fetchgit
-, SDL2
 , cmake
-, espeak
 , file
-, freetype
 , glib
 , gumbo
-, harfbuzz
 , jbig2dec
 , leptonica
 , libglvnd
@@ -17,31 +13,26 @@
 , libffi
 , libusb1
 , libuvc
-, libvlc
-, libvncserver
-, libxcb
 , libxkbcommon
 , lua5_1
 , luajit
 , makeWrapper
 , mesa
-, mupdf
 , openal
 , openjpeg
 , pcre
 , pkg-config
 , sqlite
-, tesseract
 , valgrind
 , wayland
 , wayland-protocols
-, xorg
 , buildManPages ? true, ruby
 , useBuiltinLua ? true
 , useStaticFreetype ? true
 , useStaticLibuvc ? true
 , useStaticOpenAL ? true
 , useStaticSqlite ? true
+, xz
 }:
 
 let
@@ -67,22 +58,46 @@ stdenv.mkDerivation (finalAttrs: {
     ruby
   ];
 
-  buildInputs = [
-    freetype
-    mesa
-    libglvnd
-    openal
-    sqlite
-    libxcb
-    xorg.libX11
-  ];
+ # buildInputs = [
+ #   freetype
+ #   mesa
+ #   libglvnd
+ #   openal
+ #   sqlite
+ #   libxcb
+ #   xorg.libX11
+ # ];
 
+  buildInputs = [
+    #ffmpeg
+    file
+    glib
+    gumbo
+    jbig2dec
+    leptonica
+    libglvnd
+    libdrm
+    libffi
+    libusb1
+    libuvc
+    lua5_1
+    luajit
+    mesa
+    openal
+    openjpeg.dev
+    pcre
+    sqlite
+    valgrind
+    wayland
+    wayland-protocols
+    xz
+  ];
   patches = [
     # Nixpkgs-specific: redirect vendoring
     #./000-openal.patch
     #./001-luajit.patch
     #./002-libuvc.patch
-    ./004-x11.patch
+    #./004-x11.patch
   ];
 
   # Emulate external/git/clone.sh
@@ -144,8 +159,8 @@ stdenv.mkDerivation (finalAttrs: {
     (cmakeFeatureFlag "FT_REQUIRE_HARFBUZZ" false)
     (cmakeFeatureFlag "FT_REQUIRE_PNG" false)
     (cmakeFeatureFlag "FT_REQUIRE_ZLIB" false)
-    (cmakeFeatureFlag "HYBRID_SDL" true)
-    (cmakeFeatureFlag "HYBRID_HEADLESS" true)
+    (cmakeFeatureFlag "HYBRID_SDL" false)
+    (cmakeFeatureFlag "HYBRID_HEADLESS" false)
     (cmakeFeatureFlag "DISABLE_FSRV_GAME" true)
     (cmakeFeatureFlag "DISABLE_FSRV_NET" true)
     (cmakeFeatureFlag "DISABLE_FSRV_REMOTING" true)

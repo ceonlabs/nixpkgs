@@ -4,12 +4,12 @@
 , meson, pkg-config, ninja
 , fetchFromGitLab
 , intltool, bison, flex, python3Packages
-, expat, libdrm, xorg
+, expat, libdrm
 , llvmPackages_15
 , libglvnd
 , galliumDrivers ? ["swrast" "asahi"]
 , vulkanDrivers ? ["swrast"]
-, eglPlatforms ? [ "x11" "wayland" ]
+, eglPlatforms ? [ "wayland" ]
 , wayland, wayland-protocols
 , vulkanLayers ? [ ]
 , withValgrind ? lib.meta.availableOn stdenv.hostPlatform valgrind-light && !valgrind-light.meta.broken, valgrind-light
@@ -121,8 +121,8 @@ let
     wayland
     wayland-protocols
     libxcb
-    xorg.libX11
-    xorg.libxshmfence
+    #xorg.libX11
+    #xorg.libxshmfence
     ]
     ++ lib.optional withValgrind valgrind-light;
   
@@ -130,7 +130,7 @@ let
 
   nativeBuildInputs = [
     meson pkg-config ninja
-    xorg.libpthreadstubs
+    #xorg.libpthreadstubs
     intltool bison flex
     python3Packages.python python3Packages.mako python3Packages.ply
     jdupes

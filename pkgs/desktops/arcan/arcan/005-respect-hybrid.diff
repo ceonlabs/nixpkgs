@@ -1,0 +1,13 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index bc6d5c1d..a9ebcc3b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -212,8 +212,6 @@ endif()
+ 
+ if (BUILD_PRESET STREQUAL "everything" AND NOT (CLIENT_LIBRARY_BUILD OR BUILD_PRESET STREQUAL "client" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"))
+ 	set(VIDEO_PLATFORM "egl-dri")
+-	set(HYBRID_SDL ON)
+-	set(HYBRID_HEADLESS ON)
+ endif()
+ 
+ # can ignore this abomination on BSD

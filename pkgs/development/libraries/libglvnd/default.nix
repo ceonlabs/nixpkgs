@@ -1,6 +1,5 @@
 { stdenv, lib, fetchFromGitLab
 , autoreconfHook, pkg-config, python3, addOpenGLRunpath
-, libX11, libXext, xorgproto
 }:
 
 stdenv.mkDerivation rec {
@@ -16,11 +15,9 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ autoreconfHook pkg-config python3 addOpenGLRunpath ];
-  buildInputs = [ libX11 libXext xorgproto ];
+  buildInputs = [  ];
 
   postPatch = lib.optionalString stdenv.isDarwin ''
-    substituteInPlace src/GLX/Makefile.am \
-      --replace "-Wl,-Bsymbolic " ""
     substituteInPlace src/EGL/Makefile.am \
       --replace "-Wl,-Bsymbolic " ""
     substituteInPlace src/GLdispatch/Makefile.am \
@@ -35,7 +32,7 @@ stdenv.mkDerivation rec {
     "-Wno-error=array-bounds"
   ] ++ lib.optional stdenv.cc.isClang "-Wno-error");
 
-  configureFlags  = []
+  configureFlags  = [ "--disable-glx --disable-x11" ]
     # Indirectly: https://bugs.freedesktop.org/show_bug.cgi?id=35268
     ++ lib.optional stdenv.hostPlatform.isMusl "--disable-tls"
     # Remove when aarch64-darwin asm support is upstream: https://gitlab.freedesktop.org/glvnd/libglvnd/-/issues/216
@@ -47,7 +44,6 @@ stdenv.mkDerivation rec {
   # Note that libEGL does not need it because it uses driver config files which should
   # contain absolute paths to libraries.
   postFixup = ''
-    addOpenGLRunpath $out/lib/libGLX.so
   '';
 
   passthru = { inherit (addOpenGLRunpath) driverLink; };
