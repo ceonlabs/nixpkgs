@@ -13,9 +13,9 @@
 , libffi
 , libusb1
 , libuvc
-, libxkbcommon
 , lua5_1
 , luajit
+, libxkbcommon
 , makeWrapper
 , mesa
 , openal
@@ -33,6 +33,7 @@
 , useStaticOpenAL ? true
 , useStaticSqlite ? true
 , xz
+, xorg
 }:
 
 let
@@ -70,7 +71,9 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [
     #ffmpeg
+    xorg.libX11
     file
+    libxkbcommon
     glib
     gumbo
     jbig2dec
@@ -98,6 +101,7 @@ stdenv.mkDerivation (finalAttrs: {
     #./001-luajit.patch
     #./002-libuvc.patch
     #./004-x11.patch
+    ./005-respect-hybrid.diff
   ];
 
   # Emulate external/git/clone.sh
@@ -148,7 +152,14 @@ stdenv.mkDerivation (finalAttrs: {
     "-DBUILD_PRESET=everything"
     # The upstream project recommends tagging the distribution
     "-DDISTR_TAG=Nixpkgs"
+    "-DVIDEO_PLATFORM=egl-dri"
+    "-DAGP_PLATFORM=gl21"
     "-DENGINE_BUILDTAG=${finalAttrs.version}"
+    "-DENABLE_LWA=OFF"
+    "-DDISABLE_FSRV_NET=ON"
+    "-DDISABLE_FSRV_TERMINAL=ON"
+    "-DDISABLE_FSRV_REMOTING=ON"
+    "-DDISABLE_FSRV_GAME=ON"
     (cmakeFeatureFlag "FT_DISABLE_BROTLI" true)
     (cmakeFeatureFlag "FT_DISABLE_BZIP2" true)
     (cmakeFeatureFlag "FT_DISABLE_HARFBUZZ" true)
@@ -161,11 +172,7 @@ stdenv.mkDerivation (finalAttrs: {
     (cmakeFeatureFlag "FT_REQUIRE_ZLIB" false)
     (cmakeFeatureFlag "HYBRID_SDL" false)
     (cmakeFeatureFlag "HYBRID_HEADLESS" false)
-    (cmakeFeatureFlag "DISABLE_FSRV_GAME" true)
-    (cmakeFeatureFlag "DISABLE_FSRV_NET" true)
-    (cmakeFeatureFlag "DISABLE_FSRV_REMOTING" true)
-    (cmakeFeatureFlag "DISABLE_FSRV_AVFEED" true)
-    (cmakeFeatureFlag "DISABLE_WAYLAND" false)
+    (cmakeFeatureFlag "DISABLE_WAYLAND" true)
     (cmakeFeatureFlag "BUILTIN_LUA" useBuiltinLua)
     (cmakeFeatureFlag "DISABLE_JIT" useBuiltinLua)
     (cmakeFeatureFlag "STATIC_FREETYPE" useStaticFreetype)
