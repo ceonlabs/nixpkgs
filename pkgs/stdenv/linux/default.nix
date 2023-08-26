@@ -78,6 +78,10 @@
       armv6l-linux  = import ./bootstrap-files/armv6l-musl.nix;
       x86_64-linux  = import ./bootstrap-files/x86_64-musl.nix;
     };
+    cosmo = {
+      x86_64-linux  = import ./bootstrap-files/x86_64-musl.nix;
+    };
+ 
   };
 
   # Try to find an architecture compatible with our current system. We
@@ -138,7 +142,8 @@ let
 
 
   # Download and unpack the bootstrap tools (coreutils, GCC, Glibc, ...).
-  bootstrapTools = (import (if localSystem.libc == "musl" then ./bootstrap-tools-musl else ./bootstrap-tools) {
+  #FIXME(Ariel): What do we do with cosmo here?
+  bootstrapTools = (import (if localSystem.libc == "cosmo" then ./bootstrap-tools-musl else ./bootstrap-tools) {
     inherit system bootstrapFiles;
     extraAttrs = lib.optionalAttrs config.contentAddressedByDefault {
       __contentAddressed = true;
@@ -251,6 +256,8 @@ in
           ln -s ${bootstrapTools}/include-glibc $out/include
         '' + lib.optionalString (localSystem.libc == "musl") ''
           ln -s ${bootstrapTools}/include-libc $out/include
+        '' + lib.optionalString (localSystem.libc == "cosmo") ''
+          ln -s ${bootstrapTools}/include-libc $out/include 
         '';
         passthru.isFromBootstrapFiles = true;
       };

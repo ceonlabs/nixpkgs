@@ -89,6 +89,7 @@ let
           or lib.systems.parse.abis.musl;
       });
 
+  makeCosmoParsedPlatform = parsed: parsed // { abi = lib.systems.parse.abis.cosmo; };
 
   stdenvAdapters = self: super:
     let
@@ -196,6 +197,20 @@ let
         linker = "lld";
       };
     };
+
+    # All packages built with the Cosmopolitan libc. This will override the
+    # default GNU libc on Linux systems. Non-Linux systems are not
+    # supported. 32-bit is also not supported.
+    pkgsCosmo = if stdenv.hostPlatform.isLinux && stdenv.buildPlatform.is64bit then nixpkgsFun {
+      overlays = [ (self': super': {
+        pkgsCosmo = super';
+      })] ++ overlays;
+      ${if stdenv.hostPlatform == stdenv.buildPlatform
+        then "localSystem" else "crossSystem"} = {
+        parsed = makeCosmoParsedPlatform stdenv.hostPlatform.parsed;
+      };
+    } else throw "Cosmo libc only supports 64-bit Linux systems.";
+
 
     # All packages built with the Musl libc. This will override the
     # default GNU libc on Linux systems. Non-Linux systems are not

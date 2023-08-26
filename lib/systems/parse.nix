@@ -372,6 +372,7 @@ rec {
     musleabi     = { float = "soft"; };
     musleabihf   = { float = "hard"; };
     musl         = {};
+    cosmo        = {};
 
     uclibceabi   = { float = "soft"; };
     uclibceabihf = { float = "hard"; };

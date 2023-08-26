@@ -23155,7 +23155,7 @@ with pkgs;
   # We also provide `libiconvReal`, which will always be a standalone libiconv,
   # just in case you want it regardless of platform.
   libiconv =
-    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" "nblibc" "wasilibc" ]
+    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" "cosmo" "nblibc" "wasilibc" ]
       then libcIconv (if stdenv.hostPlatform != stdenv.buildPlatform
         then libcCross
         else stdenv.cc.libc)
@@ -23174,7 +23174,7 @@ with pkgs;
   libiconvReal = callPackage ../development/libraries/libiconv { };
 
   iconv =
-    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" ] then
+    if lib.elem stdenv.hostPlatform.libc [ "glibc" "musl" "cosmo" ] then
       lib.getBin stdenv.cc.libc
     else if stdenv.hostPlatform.isDarwin then
       lib.getBin darwin.libiconv
@@ -28397,6 +28397,7 @@ with pkgs;
   multipath-tools = callPackage ../os-specific/linux/multipath-tools { };
 
   musl = callPackage ../os-specific/linux/musl { };
+  cosmo = callPackage ../os-specific/linux/cosmo { };
 
   musl-fts = callPackage ../os-specific/linux/musl-fts { };
   musl-obstack = callPackage ../os-specific/linux/musl-obstack { };
