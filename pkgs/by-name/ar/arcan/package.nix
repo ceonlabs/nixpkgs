@@ -57,12 +57,12 @@ let
   allSources = {
     letoram-arcan = {
       pname = "arcan";
-      version = "0.6.2.1-unstable-2023-11-18";
+      version = "0.6.3";
       src = fetchFromGitHub {
         owner = "letoram";
         repo = "arcan";
-        rev = "0950ee236f96a555729498d0fdf91c16901037f5";
-        hash = "sha256-TxadRlidy4KRaQ4HunPO6ISJqm6JwnMRM8y6dX6vqJ4=";
+        rev = "41332356ce977a8e09a608ac7aff5a486dd4a83d";
+        hash = "sha256-Tx0dRlidy4KRaQ4HunPO6ISJqm6JwnMRM8y6dX6vqJ4=";
       };
     };
     letoram-openal-src = fetchFromGitHub {
