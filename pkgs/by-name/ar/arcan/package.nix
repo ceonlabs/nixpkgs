@@ -187,6 +187,7 @@ stdenv.mkDerivation (finalAttrs: {
     (lib.cmakeFeature "DISTR_TAG" "Nixpkgs")
     (lib.cmakeFeature "ENGINE_BUILDTAG" finalAttrs.src.rev)
     (lib.cmakeFeature "BUILD_PRESET" "everything")
+    (lib.cmakeFeature "CMAKE_BUILD_TYPE" "Debug")
     (lib.cmakeBool "BUILTIN_LUA" useBuiltinLua)
     (lib.cmakeBool "DISABLE_JIT" useBuiltinLua)
     (lib.cmakeBool "STATIC_LIBUVC" useStaticLibuvc)
