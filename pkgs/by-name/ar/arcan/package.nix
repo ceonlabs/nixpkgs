@@ -62,7 +62,7 @@ let
         owner = "letoram";
         repo = "arcan";
         rev = "41332356ce977a8e09a608ac7aff5a486dd4a83d";
-        hash = "sha256-Tx0dRlidy4KRaQ4HunPO6ISJqm6JwnMRM8y6dX6vqJ4=";
+        hash = "sha256-ZSKOkNrFa2QgmXmmXnLkB1pehmVJbEFVeNs43Z2DSKo=";
       };
     };
     letoram-openal-src = fetchFromGitHub {
